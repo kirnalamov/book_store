@@ -26,7 +26,7 @@ CodeBlog is a FastAPI-based blog platform designed specifically for developers t
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/kirnalamov/book_store.git
 cd codeblog
 ```
 
