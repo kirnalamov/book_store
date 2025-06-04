@@ -3,8 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import models
 from database import get_db
+import models
 from routes import router
 from pathlib import Path
 from auth import get_current_user
@@ -34,13 +34,15 @@ app.add_middleware(
 # Include routes
 app.include_router(router)
 
+
 @app.get("/")
 def home(
     request: Request,
     db: Session = Depends(get_db),
     user: Optional[models.User] = Depends(get_current_user)
 ):
-    articles = db.query(models.Article).order_by(models.Article.created_at.desc()).all()
+    articles = db.query(models.Article).order_by(
+        models.Article.created_at.desc()).all()
     return templates.TemplateResponse(
         name="index.html",
         context={
@@ -50,6 +52,7 @@ def home(
             "user": user
         }
     )
+
 
 if __name__ == "__main__":
     import uvicorn
