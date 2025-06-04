@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="md:flex md:items-start md:space-x-8">
+        <!-- Profile Sidebar -->
+        <div class="md:w-1/3">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <!-- Avatar -->
+                <div class="text-center mb-6">
+                    {% if profile_user.avatar_path %}
+                    <img src="{{ url_for('uploads', path=profile_user.avatar_path) }}" 
+                         alt="{{ profile_user.username }}"
+                         class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+                    {% else %}
+                    <div class="w-32 h-32 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center">
+                        <span class="text-4xl text-gray-500">{{ profile_user.username[0]|upper }}</span>
+                    </div>
+                    {% endif %}
+                    <h1 class="text-2xl font-bold text-gray-900">{{ profile_user.username }}</h1>
+                    {% if profile_user.bio %}
+                    <p class="text-gray-600 mt-2">{{ profile_user.bio }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900">{{ profile_user.articles|length }}</div>
+                        <div class="text-sm text-gray-600">Articles</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900">{{ profile_user.total_views }}</div>
+                        <div class="text-sm text-gray-600">Total Views</div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="space-y-3">
+                    {% if profile_user.website %}
+                    <a href="{{ profile_user.website }}" target="_blank" rel="noopener"
+                        class="flex items-center text-gray-600 hover:text-blue-500">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 0a10 10 0 100 20 10 10 0 000-20zm6.613 4.614a8.523 8.523 0 011.93 5.32 20.094 20.094 0 00-5.949-.274c-.059-.149-.122-.292-.184-.441a23.879 23.879 0 00-.566-1.239 11.41 11.41 0 004.769-3.366zM8 1.707a8.821 8.821 0 012-.238 8.5 8.5 0 015.664 2.152 9.608 9.608 0 01-4.476 3.087A45.758 45.758 0 008 1.707zM1.642 8.262a8.57 8.57 0 014.73-5.981A53.998 53.998 0 009.54 7.222a32.078 32.078 0 01-7.898 1.04zm2.81 7.262a8.51 8.51 0 01-2.401-5.73c3.267.153 6.016-.203 8.236-.8a80.47 80.47 0 01.832 1.902c.14.34.274.679.401 1.013a20.106 20.106 0 00-7.068 3.615zm4.061 2.434a8.488 8.488 0 01-2.867-2.155 18.438 18.438 0 016.326-3.357c.401 1.239.739 2.511 1.008 3.81a8.461 8.461 0 01-4.467 1.702z"/>
+                        </svg>
+                        {{ profile_user.website }}
+                    </a>
+                    {% endif %}
+                    {% if profile_user.github_username %}
+                    <a href="https://github.com/{{ profile_user.github_username }}" target="_blank" rel="noopener"
+                        class="flex items-center text-gray-600 hover:text-blue-500">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.237 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        {{ profile_user.github_username }}
+                    </a>
+                    {% endif %}
+                    {% if profile_user.twitter_username %}
+                    <a href="https://twitter.com/{{ profile_user.twitter_username }}" target="_blank" rel="noopener"
+                        class="flex items-center text-gray-600 hover:text-blue-500">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        {{ profile_user.twitter_username }}
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if current_user and current_user.id == profile_user.id %}
+                <div class="mt-6">
+                    <a href="/profile/{{ profile_user.username }}/edit"
+                        class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        Edit Profile
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="md:w-2/3 mt-8 md:mt-0">
+            <!-- Activity Overview -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Activity Overview</h2>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">{{ profile_user.total_views }}</div>
+                        <div class="text-sm text-blue-600">Total Views</div>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">{{ profile_user.total_comments }}</div>
+                        <div class="text-sm text-green-600">Comments</div>
+                    </div>
+                    <div class="p-4 bg-purple-50 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600">{{ profile_user.articles|length }}</div>
+                        <div class="text-sm text-purple-600">Articles</div>
+                    </div>
+                </div>
+
+                <!-- Contribution Graph -->
+                <div class="border rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-gray-700 mb-4">Contributions</h3>
+                    <div class="grid grid-cols-7 gap-2">
+                        {% for week in range(52) %}
+                        <div class="space-y-2">
+                            {% for day in range(7) %}
+                            {% set date_key = (today - timedelta(days=((52-week)*7 + (6-day)))).isoformat() %}
+                            {% set contribution = contribution_data.get(date_key, {"count": 0, "views": 0}) %}
+                            <div class="w-4 h-4 rounded-sm {% if contribution.views > 100 %}bg-green-500{% elif contribution.views > 50 %}bg-green-400{% elif contribution.views > 10 %}bg-green-300{% elif contribution.views > 0 %}bg-green-200{% else %}bg-gray-100{% endif %}"
+                                title="{{ date_key }}: {{ contribution.views }} views">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Articles -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Articles</h2>
+                {% if articles %}
+                <div class="space-y-6">
+                    {% for article in articles %}
+                    <article class="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
+                        <h3 class="text-lg font-semibold mb-2">
+                            <a href="/article/{{ article.slug }}" class="text-gray-900 hover:text-blue-600">
+                                {{ article.title }}
+                            </a>
+                        </h3>
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>{{ article.created_at.strftime('%B %d, %Y') }}</span>
+                            <span class="mx-2">•</span>
+                            <span>{{ article.views }} views</span>
+                            <span class="mx-2">•</span>
+                            <span>{{ article.comments|length }} comments</span>
+                        </div>
+                        <p class="text-gray-600">{{ article.content[:200] }}...</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-600 text-center py-8">No articles yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

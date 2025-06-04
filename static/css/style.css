@@ -1,0 +1,74 @@
+/* Custom styles for code blocks */
+pre {
+    background: #f4f4f4;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9em;
+}
+
+/* Article content styling */
+.article-content {
+    max-width: 65ch;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.article-content h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 2rem 0 1rem;
+}
+
+.article-content h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 1.5rem 0 1rem;
+}
+
+.article-content p {
+    margin: 1rem 0;
+}
+
+/* Custom form styling */
+.form-input {
+    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700;
+}
+
+/* Image upload preview */
+.image-preview {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Markdown editor styling */
+.markdown-editor {
+    min-height: 300px;
+    font-family: 'Fira Code', monospace;
+}
+
+/* Comment section styling */
+.comment {
+    border-left: 3px solid #e5e7eb;
+    padding-left: 1rem;
+    margin: 1rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .article-content {
+        padding: 0 1rem;
+    }
+} 

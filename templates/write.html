@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Write an Article</h1>
+    
+    <form action="/write" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+            <input type="text" name="title" id="title" required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                placeholder="Enter your article title">
+        </div>
+
+        <div>
+            <label for="content" class="block text-sm font-medium text-gray-700">Content (Markdown supported)</label>
+            <div class="mt-1">
+                <textarea id="content" name="content" rows="20" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm markdown-editor"
+                    placeholder="Write your article content here..."></textarea>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                    Use Markdown for formatting. Support for **bold**, *italic*, `code`, ```code blocks```, and more.
+                </p>
+                <button type="button" id="loadExample"
+                    class="text-sm text-blue-500 hover:text-blue-700"
+                    onclick="loadExampleContent()">
+                    Load Example Article
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <label for="image" class="block text-sm font-medium text-gray-700">Cover Image (optional)</label>
+            <div class="mt-1 flex items-center">
+                <input type="file" id="image" name="image" accept="image/*"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+            <div id="image-preview" class="mt-4 hidden">
+                <img src="" alt="Preview" class="max-w-lg rounded-lg shadow-md">
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+            <a href="/" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancel
+            </a>
+            <button type="submit"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Publish Article
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Image preview functionality
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImage = imagePreview.querySelector('img');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Example content loader
+    function loadExampleContent() {
+        const titleInput = document.getElementById('title');
+        const contentInput = document.getElementById('content');
+        
+        titleInput.value = "Getting Started with FastAPI: A Comprehensive Guide";
+        
+        const exampleContent = `# Getting Started with FastAPI: A Comprehensive Guide
+
+FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.6+ based on standard Python type hints. In this guide, we'll explore its key features and build a simple API.
+
+## Key Features
+
+- **Fast**: Very high performance, on par with NodeJS and Go
+- **Fast to code**: Increase the speed to develop features by about 200% to 300%
+- **Fewer bugs**: Reduce about 40% of human (developer) induced errors
+- **Intuitive**: Great editor support. Completion everywhere. Less time debugging
+- **Easy**: Designed to be easy to use and learn. Less time reading docs
+- **Short**: Minimize code duplication. Multiple features from each parameter declaration
+- **Robust**: Get production-ready code. With automatic interactive documentation
+- **Standards-based**: Based on (and fully compatible with) OpenAPI (formerly known as Swagger) and JSON Schema
+
+## Quick Start
+
+First, install FastAPI and an ASGI server:
+
+\`\`\`bash
+pip install fastapi uvicorn
+\`\`\`
+
+Here's a simple example:
+
+\`\`\`python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+\`\`\`
+
+Run the server:
+
+\`\`\`bash
+uvicorn main:app --reload
+\`\`\`
+
+## Path Parameters
+
+You can declare path parameters with Python type annotations:
+
+\`\`\`python
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    return {"item_id": item_id}
+\`\`\`
+
+## Query Parameters
+
+When you declare function parameters that aren't part of the path parameters, they are automatically interpreted as "query" parameters:
+
+\`\`\`python
+@app.get("/items/")
+async def read_items(skip: int = 0, limit: int = 10):
+    return {"skip": skip, "limit": limit}
+\`\`\`
+
+## Request Body
+
+To declare a request body, use Pydantic models:
+
+\`\`\`python
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+\`\`\`
+
+## Conclusion
+
+FastAPI provides a modern, fast, and easy-to-use framework for building APIs. With its automatic documentation, type checking, and async support, it's an excellent choice for your next Python web project.
+
+For more information, check out the [official documentation](https://fastapi.tiangolo.com/).`;
+        
+        contentInput.value = exampleContent;
+    }
+</script>
+{% endblock %} 

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Edit Profile</h1>
+    
+    <form action="/profile/{{ user.username }}/edit" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Avatar -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
+            <div class="mt-2 flex items-center space-x-6">
+                {% if user.avatar_path %}
+                <img src="{{ url_for('uploads', path=user.avatar_path) }}" 
+                     alt="{{ user.username }}"
+                     class="w-20 h-20 rounded-full object-cover">
+                {% else %}
+                <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span class="text-2xl text-gray-500">{{ user.username[0]|upper }}</span>
+                </div>
+                {% endif %}
+                <input type="file" id="avatar" name="avatar" accept="image/*"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+        </div>
+
+        <!-- Bio -->
+        <div>
+            <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+            <div class="mt-1">
+                <textarea id="bio" name="bio" rows="4"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    placeholder="Tell us about yourself...">{{ user.bio or '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Website -->
+        <div>
+            <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+            <div class="mt-1">
+                <input type="url" name="website" id="website"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    placeholder="https://example.com"
+                    value="{{ user.website or '' }}">
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="github_username" class="block text-sm font-medium text-gray-700">GitHub Username</label>
+                <div class="mt-1">
+                    <input type="text" name="github_username" id="github_username"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        placeholder="username"
+                        value="{{ user.github_username or '' }}">
+                </div>
+            </div>
+
+            <div>
+                <label for="twitter_username" class="block text-sm font-medium text-gray-700">Twitter Username</label>
+                <div class="mt-1">
+                    <input type="text" name="twitter_username" id="twitter_username"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        placeholder="username"
+                        value="{{ user.twitter_username or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+            <a href="/profile/{{ user.username }}"
+                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancel
+            </a>
+            <button type="submit"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Avatar preview functionality
+    const avatarInput = document.getElementById('avatar');
+    const currentAvatar = document.querySelector('img, div.rounded-full');
+    
+    avatarInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (currentAvatar.tagName === 'IMG') {
+                    currentAvatar.src = e.target.result;
+                } else {
+                    // Replace the placeholder div with an img
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = "Profile preview";
+                    img.className = "w-20 h-20 rounded-full object-cover";
+                    currentAvatar.parentNode.replaceChild(img, currentAvatar);
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %} 
