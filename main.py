@@ -1,3 +1,5 @@
+import sys
+from pathlib import Path
 from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -5,10 +7,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import get_db
 import models
-from routes import router
-from pathlib import Path
 from auth import get_current_user
 from typing import Optional
+from routers.auth_router import router as auth_router
+from routers.articles_router import router as articles_router
+from routers.comments_router import router as comments_router
+from routers.profiles_router import router as profiles_router
+
+# Настройка sys.path для корректных импортов
+# Указываем текущую директорию (C:\vscode_projects\books_store\book_store)
+sys.path.append(str(Path(__file__).parent))
 
 # Create upload directory if it doesn't exist
 Path("uploads").mkdir(exist_ok=True)
@@ -32,7 +40,10 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(router)
+app.include_router(auth_router)
+app.include_router(articles_router)
+app.include_router(comments_router)
+app.include_router(profiles_router)
 
 
 @app.get("/")
@@ -56,4 +67,4 @@ def home(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True) 
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
