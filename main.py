@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
@@ -13,10 +12,6 @@ from routers.auth_router import router as auth_router
 from routers.articles_router import router as articles_router
 from routers.comments_router import router as comments_router
 from routers.profiles_router import router as profiles_router
-
-# Настройка sys.path для корректных импортов
-# Указываем текущую директорию (C:\vscode_projects\books_store\book_store)
-sys.path.append(str(Path(__file__).parent))
 
 # Create upload directory if it doesn't exist
 Path("uploads").mkdir(exist_ok=True)
