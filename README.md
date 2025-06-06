@@ -44,6 +44,9 @@ pip install -r requirements.txt
 4. Run the application:
 ```bash
 python main.py
+# or 
+uvicorn main:app --reload
+
 ```
 
 The application will be available at `http://localhost:8000`
