@@ -167,13 +167,13 @@ def list_articles(
         db: Session = Depends(get_db),
         user: Optional[models.User] = Depends(get_current_user)
 ):
-    articles = db.query(models.Article).order_by(models.Article.created_at.desc()).all()
+    books = db.query(models.Book).order_by(models.Book.created_at.desc()).all()
     return templates.TemplateResponse(
-        name="articles.html",
+        name="books.html",
         context={
             "request": request,
-            "title": "All Articles",
-            "articles": articles,
+            "title": "All Books",
+            "books": books,
             "user": user
         }
     )
