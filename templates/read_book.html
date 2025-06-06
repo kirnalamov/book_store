@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.js"></script>
+    <script>
+        window.pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.css" />
+{% endblock %}
+
+
+{% block content %}
+   <style>
+        #pdf-canvas {
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+        body {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #zoom-controls {
+            margin: 10px 0;
+        }
+        #zoom-value {
+            font-weight: bold;
+        }
+#pdf-container {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#pdf-canvas {
+    border: 1px solid #ccc;
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+}
+
+.textLayer{
+  position:absolute;
+  text-align:initial;
+  inset:0;
+  overflow:hidden;
+  opacity:0.25;
+  line-height:1;
+  -webkit-text-size-adjust:none;
+     -moz-text-size-adjust:none;
+          text-size-adjust:none;
+  forced-color-adjust:none;
+  transform-origin:0 0;
+  z-index:2;
+}
+
+.textLayer :is(span, br){
+    color:transparent;
+    position:absolute;
+    white-space:pre;
+    cursor:text;
+    transform-origin:0% 0%;
+  }
+
+.textLayer span.markedContent{
+    top:0;
+    height:0;
+  }
+
+.textLayer .highlight{
+    --highlight-bg-color:rgb(180 0 170);
+    --highlight-selected-bg-color:rgb(0 100 0);
+
+    margin:-1px;
+    padding:1px;
+    background-color:var(--highlight-bg-color);
+    border-radius:4px;
+  }
+
+@media screen and (forced-colors: active){
+
+.textLayer .highlight{
+      --highlight-bg-color:Highlight;
+      --highlight-selected-bg-color:ButtonText;
+  }
+    }
+
+.textLayer .highlight.appended{
+      position:initial;
+    }
+
+.textLayer .highlight.begin{
+      border-radius:4px 0 0 4px;
+    }
+
+.textLayer .highlight.end{
+      border-radius:0 4px 4px 0;
+    }
+
+.textLayer .highlight.middle{
+      border-radius:0;
+    }
+
+.textLayer .highlight.selected{
+      background-color:var(--highlight-selected-bg-color);
+    }
+
+.textLayer ::-moz-selection{
+    background:blue;
+    background:AccentColor;
+  }
+
+.textLayer ::selection{
+    background:blue;
+    background:AccentColor;
+  }
+
+.textLayer br::-moz-selection{
+    background:transparent;
+  }
+
+.textLayer br::selection{
+    background:transparent;
+  }
+
+.textLayer .endOfContent{
+    display:block;
+    position:absolute;
+    inset:100% 0 0;
+    z-index:-1;
+    cursor:default;
+    -webkit-user-select:none;
+       -moz-user-select:none;
+            user-select:none;
+  }
+
+.textLayer .endOfContent.active{
+      top:0;
+    }
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <h1 class="text-3xl font-bold mb-6">{{ book.title }}</h1>
+    <input type="hidden" id="book-id" value="{{ book.slug }}">
+
+    <div id="zoom-controls" class="mb-4">
+        Масштаб: <span id="zoom-value">100%</span><br>
+        <input type="range" id="zoom-range" min="50" max="300" value="150" step="10" />
+    </div>
+
+    <div class="flex justify-center space-x-4 mb-6">
+        <button onclick="prevPage()" class="px-4 py-2 bg-gray-200 rounded">← Предыдущая</button>
+        <button onclick="nextPage()" class="px-4 py-2 bg-gray-200 rounded">Следующая →</button>
+    </div>
+
+ 
+  <div id="pdf-container" >
+    <canvas id="pdf-canvas"></canvas>
+    <div id="text-layer" class="textLayer" ></div>
+  </div>
+
+
+
+
+<script>
+    let totalPages = 0;
+    let currentPage = 1;
+    let currentScale = 1;
+    const bookId = document.getElementById("book-id").value;
+    const zoomRange = document.getElementById("zoom-range");
+    const zoomValue = document.getElementById("zoom-value");
+    console.log(bookId);
+    zoomRange.addEventListener("input", () => {
+        currentScale = Math.min(zoomRange.value / 100,30);
+        zoomValue.textContent = zoomRange.value + "%";
+        loadPage(currentPage);
+    });
+
+    async function loadPage(pageNum) {
+        const res = await fetch(`/books/pdf_page/${bookId}/${pageNum}`);
+        const json = await res.json();
+        if (json.error) {
+            alert(json.error);
+            return;
+        }
+
+    const base64Data = json.data;
+    const pdfData = atob(base64Data);
+    const bytes = new Uint8Array(pdfData.length);
+    for (let i = 0; i < pdfData.length; i++) {
+        bytes[i] = pdfData.charCodeAt(i);
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data: bytes });
+    const pdfDoc = await loadingTask.promise;
+    const page = await pdfDoc.getPage(1);
+    const viewport = page.getViewport({ scale: currentScale , rotation: page.rotate });
+
+    // CANVAS
+    const canvas = document.getElementById("pdf-canvas");
+    const context = canvas.getContext("2d");
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    // TEXT LAYER
+    const textLayerDiv = document.getElementById("text-layer");
+    textLayerDiv.innerHTML = "";
+    textLayerDiv.style.height = `${viewport.height}px`;
+    textLayerDiv.style.width = `${viewport.width}px`;
+
+    // Обновим контейнер
+    const container = document.getElementById("pdf-container");
+    container.style.width = `${viewport.width}px`;
+    container.style.height = `${viewport.height}px`;
+
+
+    // Рендерим PDF
+    await page.render({
+        canvasContext: context,
+        viewport: viewport
+    }).promise;
+
+    // Загружаем текст
+    const textContent = await page.getTextContent();
+    await pdfjsLib.renderTextLayer({
+        textContent: textContent,
+        container: textLayerDiv,
+        viewport: viewport,
+
+    }).promise;
+    const annotations = await page.getAnnotations();
+ annotations.forEach(annotation => {
+    if (annotation.subtype === 'Link') {
+        const rect = pdfjsLib.Util.normalizeRect(annotation.rect);
+        const transform = viewport.transform;
+
+        const p1 = pdfjsLib.Util.applyTransform([rect[0], rect[1]], transform);
+        const p2 = pdfjsLib.Util.applyTransform([rect[2], rect[3]], transform);
+
+        const left = Math.min(p1[0], p2[0]);
+        const right = Math.max(p1[0], p2[0]);
+        const bottom = Math.min(p1[1], p2[1]);
+        const top = Math.max(p1[1], p2[1]);
+
+        const width = right - left;
+        const height = top - bottom;
+
+        const linkEl = document.createElement("a");
+        linkEl.style.position = "absolute";
+        linkEl.style.left = `${left}px`;
+        linkEl.style.top = `${bottom}px`;
+        linkEl.style.width = `${width}px`;
+        linkEl.style.height = `${height}px`;
+        linkEl.style.zIndex = "1000";
+        linkEl.style.backgroundColor = "rgba(0, 0, 255, 0.1)"; // для проверки
+        linkEl.style.pointerEvents = "auto";
+        linkEl.style.display = "block";
+
+        // Внешняя ссылка
+        if (annotation.url) {
+            linkEl.href = annotation.url;
+            linkEl.target = "_blank";
+            linkEl.title = annotation.url;
+        } else if (annotation.dest) {
+            // Внутренняя ссылка на другую страницу
+            linkEl.href = "#";
+            linkEl.title = "Перейти";
+            linkEl.addEventListener("click", async (e) => {
+                e.preventDefault();
+                // Получаем страницу назначения
+                const dest = await pdfDoc.getDestination(annotation.dest);
+                if (dest) {
+                    // dest[0] — это индекс страницы (0-based)
+                    currentPage = dest[0] + 1;
+                    loadPage(currentPage);
+                }
+            });
+        } else {
+            // Если есть action, можно попробовать обработать, если нужно
+        }
+
+        textLayerDiv.appendChild(linkEl);
+    }
+});
+    }
+
+    function nextPage() {
+        currentPage++;
+        loadPage(currentPage);
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            loadPage(currentPage);
+        }
+    }
+
+    // Загружаем первую страницу при открытии
+    loadPage(currentPage);
+
+</script>
+{% endblock %}
