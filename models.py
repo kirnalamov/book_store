@@ -72,6 +72,7 @@ class Book(Base):
                         onupdate=datetime.utcnow)
     author_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="books")
+
     # comments = relationship("Comment", back_populates="article")
 
     def generate_slug(self):
