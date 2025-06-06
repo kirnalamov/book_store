@@ -45,9 +45,9 @@ app.include_router(profiles_router)
 
 @app.get("/")
 def home(
-    request: Request,
-    db: Session = Depends(get_db),
-    user: Optional[models.User] = Depends(get_current_user)
+        request: Request,
+        db: Session = Depends(get_db),
+        user: Optional[models.User] = Depends(get_current_user)
 ):
     articles = db.query(models.Article).order_by(
         models.Article.created_at.desc()).all()
@@ -64,4 +64,5 @@ def home(
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

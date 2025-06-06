@@ -24,20 +24,20 @@ def register_page(request: Request):
 
 @router.post("/register")
 async def register(
-    username: str = Form(...),
-    email: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db)
+        username: str = Form(...),
+        email: str = Form(...),
+        password: str = Form(...),
+        db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
     if user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
+
     hashed_password = get_password_hash(password)
     new_user = models.User(username=username, email=email, hashed_password=hashed_password)
     db.add(new_user)
     db.commit()
-    
+
     return RedirectResponse(url="/auth/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -51,9 +51,9 @@ def login_page(request: Request):
 
 @router.post("/login")
 async def login(
-    username: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db)
+        username: str = Form(...),
+        password: str = Form(...),
+        db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
@@ -61,13 +61,13 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password"
         )
-    
+
     access_token_expires = timedelta(minutes=60)
     access_token = create_access_token(
         data={"sub": user.username},
         expires_delta=access_token_expires
     )
-    
+
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(
         key="access_token",
