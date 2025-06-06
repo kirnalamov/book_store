@@ -11,6 +11,7 @@ from datetime import datetime
 import markdown2
 from slugify import slugify
 from werkzeug.utils import secure_filename
+import fitz  # PyMuPDF
 
 router = APIRouter(
     prefix="/books",
@@ -46,16 +47,28 @@ async def create_book(
         slug=slugify(title)
     )
 
-    if cover is not None:
-        file_location = f"uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{cover.filename}"
-        with open(file_location, "wb+") as file_object:
-            shutil.copyfileobj(cover.file, file_object)
-        book_to_add.cover_path = file_location.replace("uploads/", "")
-    
+    # сохранение книги
     book_location = f"uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(book.filename)}"
     with open(book_location, "wb+") as book_object:
         shutil.copyfileobj(book.file, book_object)
     book_to_add.pdf_path = book_location.replace("uploads/", "")
+
+    # сохранение превью книги
+    pdf_document = fitz.open(book_location)
+    if pdf_document.page_count < 1:
+        pdf_document.close()
+        raise HTTPException(status_code=400, detail="PDF is empty")
+
+    page = pdf_document.load_page(0)
+
+    # Рендерим страницу в изображение
+    pix = page.get_pixmap(matrix=fitz.Matrix(0.5, 0.5))  # Масштаб 50% (0.5x)
+    cover_location = book_location[:-4] + "_cover.png"
+    pix.save(cover_location, "PNG")
+
+    pdf_document.close()
+
+    book_to_add.cover_path = cover_location.replace("uploads/", "")
 
     db.add(book_to_add)
     db.commit()
