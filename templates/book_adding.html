@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Add a Book</h1>
+    
+    <form action="/books/add" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+            <input type="text" name="title" id="title" required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                placeholder="Enter your book title">
+        </div>
+
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Description (Markdown supported)</label>
+            <div class="mt-1">
+                <textarea id="description" name="description" rows="10" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm markdown-editor"
+                    placeholder="Write your book description here..."></textarea>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                    Use Markdown for formatting. Support for **bold**, *italic*, `code`, ```code blocks```, and more.
+                </p>
+                <button type="button" id="loadExample"
+                    class="text-sm text-blue-500 hover:text-blue-700"
+                    onclick="loadExampleDescription()">
+                    Load Example Description
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <label for="cover" class="block text-sm font-medium text-gray-700">Cover Image (optional)</label>
+            <div class="mt-1 flex items-center">
+                <input type="file" id="cover" name="cover" accept="image/*"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+            <div id="cover-preview" class="mt-4 hidden">
+                <img src="" alt="Preview" class="max-w-lg rounded-lg shadow-md">
+            </div>
+        </div>
+
+        <div>
+            <label for="book" class="block text-sm font-medium text-gray-700">Book File (PDF)</label>
+            <div class="mt-1 flex items-center">
+                <input type="file" id="book" name="book" accept="application/pdf" required
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+            <a href="/" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancel
+            </a>
+            <button type="submit"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Publish Book
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Cover image preview functionality
+    const coverInput = document.getElementById('cover');
+    const coverPreview = document.getElementById('cover-preview');
+    const previewImage = coverPreview.querySelector('img');
+
+    coverInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                coverPreview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Example description loader
+    function loadExampleDescription() {
+        const titleInput = document.getElementById('title');
+        const descriptionInput = document.getElementById('description');
+        
+        titleInput.value = "Introduction to Python Programming";
+        
+        const exampleDescription = `# Introduction to Python Programming
+
+This book provides a comprehensive introduction to Python, a versatile and powerful programming language. Ideal for beginners and intermediate learners, it covers the essentials to get you started.
+
+## Key Topics Covered
+
+- **Basics**: Variables, data types, and basic operations
+- **Control Flow**: If statements, loops, and exception handling
+- **Functions**: Defining and using functions, lambda expressions
+- **Data Structures**: Lists, tuples, dictionaries, and sets
+- **Modules**: Importing and creating your own modules
+- **File I/O**: Reading from and writing to files
+- **OOP**: Object-oriented programming concepts, classes, and inheritance
+
+## Why Python?
+
+- **Easy to Learn**: Simple syntax, readable code
+- **Versatile**: Used in web development, data science, automation, and more
+- **Community**: Large, active community with extensive libraries
+
+## About This Book
+
+This book includes practical examples, exercises, and projects to help you master Python. Whether you're new to programming or looking to expand your skills, this guide will take you through the fundamentals and beyond.
+
+For more resources, visit [Python.org](https://www.python.org/).`;
+        
+        descriptionInput.value = exampleDescription;
+    }
+</script>
+{% endblock %}

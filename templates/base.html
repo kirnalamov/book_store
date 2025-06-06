@@ -21,8 +21,10 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
+                    <a href="/books" class="py-4 px-2 text-gray-500 hover:text-gray-900">Books</a>
                     <a href="/articles" class="py-4 px-2 text-gray-500 hover:text-gray-900">Articles</a>
                     {% if user %}
+                        <a href="/books/add" class="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Add book</a>
                         <a href="/articles/write" class="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Write Article</a>
                         <a href="/profile" class="py-4 px-2 text-gray-500 hover:text-gray-900">Profile</a>
                         <a href="/auth/logout" class="py-4 px-2 text-gray-500 hover:text-gray-900">Logout</a>

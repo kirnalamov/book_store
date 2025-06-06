@@ -23,6 +23,7 @@ class User(Base):
     twitter_username = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     articles = relationship("Article", back_populates="author")
+    books = relationship("Book", back_populates="author")
     comments = relationship("Comment", back_populates="author")
 
     @property
@@ -50,6 +51,28 @@ class Article(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="articles")
     comments = relationship("Comment", back_populates="article")
+
+    def generate_slug(self):
+        return slugify(self.title)
+
+
+class Book(Base):
+    __tablename__ = "books"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200))
+    slug = Column(String(250), unique=True, index=True)
+    description = Column(Text)
+    code_snippet = Column(Text, nullable=True)
+    pdf_path = Column(String(500), nullable=True)
+    cover_path = Column(String(500), nullable=True)
+    views = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
+    author_id = Column(Integer, ForeignKey("users.id"))
+    author = relationship("User", back_populates="books")
+    # comments = relationship("Comment", back_populates="article")
 
     def generate_slug(self):
         return slugify(self.title)

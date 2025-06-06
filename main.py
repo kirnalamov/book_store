@@ -10,6 +10,7 @@ from auth import get_current_user
 from typing import Optional
 from routers.auth_router import router as auth_router
 from routers.articles_router import router as articles_router
+from routers.books import router as books_router
 from routers.comments_router import router as comments_router
 from routers.profiles_router import router as profiles_router
 
@@ -37,6 +38,7 @@ app.add_middleware(
 # Include routes
 app.include_router(auth_router)
 app.include_router(articles_router)
+app.include_router(books_router)
 app.include_router(comments_router)
 app.include_router(profiles_router)
 
