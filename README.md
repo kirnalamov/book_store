@@ -27,26 +27,41 @@ CodeBlog is a FastAPI-based blog platform designed specifically for developers t
 1. Clone the repository:
 ```bash
 git clone https://github.com/kirnalamov/book_store.git
-cd codeblog
+cd book_store
 ```
 
-2. Create a virtual environment and activate it:
+2. Установка poetry:
+Для Windows
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+```
+Для Linux
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-3. Install dependencies:
+3. Установка настройки создания виртуального окружения в папке проекта:
 ```bash
-pip install -r requirements.txt
+poetry config virtualenvs.in-project true
 ```
 
-4. Run the application:
+4. Установка используемой версии python для виртуального окружения (у вас путь может отличаться):
 ```bash
-python main.py
+ poetry env use C:\Users\Admin\AppData\Local\Programs\Python\Python312\python.exe
+```
+
+5. Устновка зависимостей:
+```bash
+poetry install
+```
+
+6. Запуск приложения:
+```bash
+poetry run python main.py
 # or 
-uvicorn main:app --reload
-
+poetry shell
+python main.py
+# poetry shell входит в виртуальное окружение, чтобы из него выйти введите команду exit
 ```
 
 The application will be available at `http://localhost:8000`
@@ -81,4 +96,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details. # book_store
-Тестовый коммит
