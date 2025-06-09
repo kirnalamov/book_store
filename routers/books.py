@@ -8,7 +8,9 @@ from database import get_db
 from auth import get_current_user, get_current_active_user
 import shutil
 from datetime import datetime
-import markdown2
+#import markdown2
+import base64
+import os
 from slugify import slugify
 from werkzeug.utils import secure_filename
 import fitz  # PyMuPDF
@@ -76,32 +78,53 @@ async def create_book(
     return RedirectResponse(url="/books", status_code=status.HTTP_302_FOUND)
 
 
-@router.get("/article/{slug}")
-def read_article(
-        request: Request,
-        slug: str,
-        db: Session = Depends(get_db),
-        user: Optional[models.User] = Depends(get_current_user)
+@router.get("/read/{book_id}")
+def read_book_page(
+    request: Request,
+    book_id: str,
+    db: Session = Depends(get_db),
+    user: Optional[models.User] = Depends(get_current_user)
 ):
-    article = db.query(models.Article).filter(models.Article.slug == slug).first()
-    if not article:
-        raise HTTPException(status_code=404, detail="Article not found")
+    
+    book = db.query(models.Book).filter(models.Book.slug == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Книга не найдена")
 
-    # Increment view count
-    article.views += 1
-    db.commit()
-
-    html_content = markdown2.markdown(article.content, extras=["fenced-code-blocks"])
     return templates.TemplateResponse(
-        name="article.html",
-        context={
+        "read_book.html",
+        {
             "request": request,
-            "title": article.title,
-            "article": article,
-            "content": html_content,
+            "book": book,
+            "title": f"Чтение - {book.title}",
             "user": user
         }
     )
+
+
+@router.get("/pdf_page/{book_id}/{page_number}")
+def get_pdf_page(
+    book_id: str,
+    page_number: int,
+    db: Session = Depends(get_db)
+):
+    book = db.query(models.Book).filter(models.Book.slug == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Книга не найдена")
+
+    file_path = os.path.join("uploads", book.pdf_path)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Файл книги не найден")
+
+    with fitz.open(file_path) as doc:
+        if page_number < 1 or page_number > doc.page_count:
+            raise HTTPException(status_code=400, detail="Неверный номер страницы")
+
+        new_doc = fitz.open()
+        new_doc.insert_pdf(doc, from_page=page_number - 1, to_page=page_number - 1)
+        pdf_bytes = new_doc.write()
+
+        encoded = base64.b64encode(pdf_bytes).decode('utf-8')
+        return {"data": encoded}
 
 
 @router.get("/article/{slug}/edit")
