@@ -19,7 +19,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
-            max-width: 100%;
+          
             height: auto;
         }
         body {
@@ -45,7 +45,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
-            max-width: 100%;
+           
             height: auto;
 }
 
@@ -183,7 +183,7 @@
     const zoomValue = document.getElementById("zoom-value");
     console.log(bookId);
     zoomRange.addEventListener("input", () => {
-        currentScale = Math.min(zoomRange.value / 100,30);
+        currentScale = Math.round(  Math.min(zoomRange.value / 100,30),1);
         zoomValue.textContent = zoomRange.value + "%";
         loadPage(currentPage);
     });
@@ -209,16 +209,25 @@
     const viewport = page.getViewport({ scale: currentScale , rotation: page.rotate });
 
     // CANVAS
+
+
+
     const canvas = document.getElementById("pdf-canvas");
     const context = canvas.getContext("2d");
     canvas.height = viewport.height;
     canvas.width = viewport.width;
+    const dpr = window.devicePixelRatio || 1;
 
+    canvas.width = Math.floor(viewport.width );
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = `${Math.floor(viewport.width)}px`;
+    canvas.style.height = `${Math.floor(viewport.height)}px`;
+    //context.setTransform(dpr, 0, 0, dpr, 0, 0);
     // TEXT LAYER
     const textLayerDiv = document.getElementById("text-layer");
     textLayerDiv.innerHTML = "";
-    textLayerDiv.style.height = `${viewport.height}px`;
-    textLayerDiv.style.width = `${viewport.width}px`;
+    textLayerDiv.style.height = `${Math.floor(viewport.height)}px`;
+    textLayerDiv.style.width = `${Math.floor(viewport.width)}px`;
 
     // Обновим контейнер
     const container = document.getElementById("pdf-container");
