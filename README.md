@@ -46,10 +46,19 @@ poetry config virtualenvs.in-project true
 ```
 
 4. Установка используемой версии python для виртуального окружения (у вас путь может отличаться):
+   
+bash
 ```bash
- poetry env use C:\Users\Admin\AppData\Local\Programs\Python\Python312\python.exe
+poetry env use "$USERPROFILE/AppData/Local/Programs/Python/Python312/python.exe"
 ```
-
+cmd
+```cmd
+poetry env use "C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python312\python.exe"
+```
+PowerShell
+```PowerShell
+poetry env use "C:\Users\$env:USERNAME\AppData\Local\Programs\Python\Python312\python.exe"
+```
 5. Устновка зависимостей:
 ```bash
 poetry install
