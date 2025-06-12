@@ -77,6 +77,19 @@ async def create_book(
 
     return RedirectResponse(url="/books", status_code=status.HTTP_302_FOUND)
 
+@router.get("/pdf_meta/{book_id}")
+def get_pdf_meta(book_id: str, db: Session = Depends(get_db)):
+    book = db.query(models.Book).filter(models.Book.slug == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Книга не найдена")
+
+    file_path = os.path.join("uploads", book.pdf_path)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Файл книги не найден")
+
+    with fitz.open(file_path) as doc:
+        return {"total_pages": doc.page_count}
+
 
 @router.get("/read/{book_id}")
 def read_book_page(
